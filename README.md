@@ -25,7 +25,7 @@ In your project's Gruntfile, add a section named `lego_market_index` to the data
 ```js
 grunt.initConfig({
   lego_market_index: {
-    options: {
+    defaults: {
       config: 'test/src/config.json',
       modsDir: 'test/src/mods/',
       output: 'test/result/index.js'
@@ -56,10 +56,10 @@ In this example, the default options are used to do something with whatever. So 
 ```js
 grunt.initConfig({
   lego_market_index: {
-    options: {
-    config: 'test/src/config.json',
-    modsDir: 'test/src/mods/',
-    output: 'test/result/index.js'
+    defaults: {
+      config: 'test/src/config.json',
+      modsDir: 'test/src/mods/',
+      output: 'test/result/index.js'
     }
   }
 });

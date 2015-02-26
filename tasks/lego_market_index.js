@@ -10,7 +10,8 @@
 
 var fs = require('fs'),
     path = require('path'),
-    chalk = require('chalk');
+    chalk = require('chalk'),
+    _ = require('lodash');
 
 function collecMods(modsDir, callback) {
     var mods = [],
@@ -62,27 +63,37 @@ function wrapModsWithKMD(config, mods, callback) {
         tab + tab + '\'base\': \'http://g.tbcdn.cn/' + config.name + '/' + config.version + '\'' + enter +
         tab + '}';
 
-    var pkgArr = config.dependencies.packages.map(function(pg) {
+    var pkgArr = _.isEmpty(config.dependencies.packages) ? '' : config.dependencies.packages.map(function(pg) {
         return ', {' + enter +
             tab + tab + '\'name\': \'' + pg.name + '\',' + enter +
             tab + tab + '\'base\': \'' + pg.base + '\'' + enter +
             tab + '}';
     }).join('');
 
-    var middle2 = '],' + enter +
-        tab + '\'modules\': {' + enter;
+    var pkgEnd = ']';
 
-    var modulesArr = [];
+    var modules = '';
 
-    for (var module in config.dependencies.modules) {
-        modulesArr.push(tab + tab + '\'' + module + '\': ' + JSON.stringify(config.dependencies.modules[module]));
+    if (!_.isEmpty(config.dependencies.modules)) {
+
+        modules += ',' + enter +
+            tab + '\'modules\': {' + enter;
+
+        var modulesArr = [];
+
+        _.forEach(config.dependencies.modules, function(value, key) {
+            modulesArr.push(tab + tab + '\'' + key + '\': ' + JSON.stringify(value));
+        });
+
+        modules += modulesArr.join(',');
+
+        modules += enter + tab + '}';
+
     }
 
-    var modules = modulesArr.join(',');
+    var end = enter + '});';
 
-    var end = enter + tab + '}' + enter + '});';
-
-    return start + modsArr + middle + packages + pkgArr + middle2 + modules + end;
+    return start + modsArr + middle + packages + pkgArr + pkgEnd + modules + end;
 }
 
 function createFile(output, content, callback) {
@@ -95,13 +106,13 @@ function createFile(output, content, callback) {
     });
 }
 
-function createModsFile(config, modsDir, output, callback) {
-    collecMods(modsDir, function(err, mods) {
+function createModsFile(config, options, callback) {
+    collecMods(options.modsDir, function(err, mods) {
         if (err) {
             return callback(err);
         }
 
-        createFile(output, wrapModsWithKMD(config, mods), function(err) {
+        createFile(options.output, wrapModsWithKMD(config, mods), function(err) {
             if (err) {
                 return callback(err);
             } else {
@@ -119,11 +130,20 @@ module.exports = function(grunt) {
 
     grunt.registerMultiTask('lego_market_index', 'generate the index file of a market package in lego project', function() {
         var done = this.async(),
-            options = this.options();
+            options = this.data,
+            cfg;
 
-        var cfg = grunt.file.readJSON(options.config);
+        try {
+            cfg = grunt.file.readJSON(options.config);
+        } catch (err) {
+            grunt.fail.warn(err);
+        }
 
-        createModsFile(cfg, options.modsDir, options.output, function(err, success) {
+        if (!cfg || !cfg.name || !cfg.version) {
+            grunt.fail.warn('config.json must have name & version!');
+        }
+
+        createModsFile(cfg, options, function(err, success) {
             if (err) {
                 grunt.log.error(err);
             } else {
