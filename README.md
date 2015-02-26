@@ -26,11 +26,10 @@ In your project's Gruntfile, add a section named `lego_market_index` to the data
 grunt.initConfig({
   lego_market_index: {
     options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+      config: 'test/src/config.json',
+      modsDir: 'test/src/mods/',
+      output: 'test/result/index.js'
+    }
   },
 });
 ```
@@ -57,28 +56,12 @@ In this example, the default options are used to do something with whatever. So 
 ```js
 grunt.initConfig({
   lego_market_index: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
-
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
-
-```js
-grunt.initConfig({
-  lego_market_index: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
+    config: 'test/src/config.json',
+    modsDir: 'test/src/mods/',
+    output: 'test/result/index.js'
+    }
+  }
 });
 ```
 

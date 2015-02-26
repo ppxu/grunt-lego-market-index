@@ -25,15 +25,16 @@ module.exports = function(grunt) {
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['tmp']
+      tests: ['test/result/*.*']
     },
 
     // Configuration to be run (and then tested).
     lego_market_index: {
       default_options: {
         options: {
-          modsDir: 'mods/',
-          output: 'index.js'
+          config: 'test/src/config.json',
+          modsDir: 'test/src/mods/',
+          output: 'test/result/index.js'
         }
       }
     },

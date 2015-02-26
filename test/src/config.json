@@ -1,0 +1,20 @@
+{
+    "name": "lego-market-test",
+    "version": "1.0.1",
+    "dependencies": {
+        "packages": [{
+            "name": "fp",
+            "base": "http://g.tbcdn.cn/tb/tb-fp/14.9.7",
+            "ignorePackageNameInUri": true
+        }],
+        "modules": {
+            "mui/view-port-listen": {
+                "requires": [
+                    "base",
+                    "node"
+                ],
+                "path": "mui/view-port-listen/1.0.3/index.js"
+            }
+        }
+    }
+}

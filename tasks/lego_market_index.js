@@ -9,7 +9,8 @@
 'use strict';
 
 var fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    chalk = require('chalk');
 
 function collecMods(modsDir, callback) {
     var mods = [],
@@ -84,8 +85,8 @@ function wrapModsWithKMD(config, mods, callback) {
     return start + modsArr + middle + packages + pkgArr + middle2 + modules + end;
 }
 
-function createFile(filePath, content, callback) {
-    fs.writeFile(filePath, content, function(err) {
+function createFile(output, content, callback) {
+    fs.writeFile(output, content, function(err) {
         if (err) {
             return callback(err);
         } else {
@@ -94,13 +95,13 @@ function createFile(filePath, content, callback) {
     });
 }
 
-function createModsFile(config, modsDir, modsFile, callback) {
+function createModsFile(config, modsDir, output, callback) {
     collecMods(modsDir, function(err, mods) {
         if (err) {
             return callback(err);
         }
 
-        createFile(modsFile, wrapModsWithKMD(config, mods), function(err) {
+        createFile(output, wrapModsWithKMD(config, mods), function(err) {
             if (err) {
                 return callback(err);
             } else {
@@ -117,15 +118,16 @@ module.exports = function(grunt) {
     // creation: http://gruntjs.com/creating-tasks
 
     grunt.registerMultiTask('lego_market_index', 'generate the index file of a market package in lego project', function() {
-        var cfg = grunt.file.readJSON('src/config.json');
         var done = this.async(),
-            data = this.data;
+            options = this.options();
 
-        createModsFile(cfg, data.modsDir, data.modsOutput, function(err, success) {
+        var cfg = grunt.file.readJSON(options.config);
+
+        createModsFile(cfg, options.modsDir, options.output, function(err, success) {
             if (err) {
                 grunt.log.error(err);
             } else {
-                grunt.log.ok('file ' + data.modsOutput + ' has been created successfuly');
+                grunt.log.ok('file ' + chalk.cyan(options.output) + ' has been created successfuly');
             }
             done();
         });
