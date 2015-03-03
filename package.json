@@ -1,7 +1,7 @@
 {
   "name": "@ali/grunt-lego-market-index",
   "description": "generate the index file of a market package in lego project",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/ppxu/grunt-lego-market-index",
   "author": {
     "name": "ppxu",
