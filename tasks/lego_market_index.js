@@ -40,7 +40,7 @@ function collecMods(modsDir, callback) {
     });
 }
 
-function wrapModsWithKMD(config, mods, callback) {
+function wrapModsWithKMD(config, mods, options) {
     var tab = '    ',
         enter = '\n';
 
@@ -49,6 +49,9 @@ function wrapModsWithKMD(config, mods, callback) {
         tab + '\'' + config.name + '\': {' + enter +
         tab + tab + 'mods: [';
 
+
+    var prefix = options.assetsPrefix || 'http://g.alicdn.com/';
+        
     var modsArr = mods.sort().map(function(mod) {
         return '\'' + mod + '\'';
     }).join(', ');
@@ -58,15 +61,17 @@ function wrapModsWithKMD(config, mods, callback) {
         tab + '},' + enter;
 
     var packages =
-        tab + '\'package\': [{' + enter +
+        tab + '\'packages\': [{' + enter +
         tab + tab + '\'name\': \'' + config.name + '\',' + enter +
-        tab + tab + '\'base\': \'http://g.tbcdn.cn/' + config.name + '/' + config.version + '\'' + enter +
+        tab + tab + '\'base\': \''+ prefix + config.name + '/' + config.version + '\',' + enter +
+        tab + tab + '\'ignorePackageNameInUri\': true' + enter +
         tab + '}';
 
     var pkgArr = _.isEmpty(config.dependencies.packages) ? '' : config.dependencies.packages.map(function(pg) {
         return ', {' + enter +
             tab + tab + '\'name\': \'' + pg.name + '\',' + enter +
-            tab + tab + '\'base\': \'' + pg.base + '\'' + enter +
+            tab + tab + '\'base\': \'' + pg.base + '\',' + enter +
+            tab + tab + '\'ignorePackageNameInUri\': ' + (pg.ignorePackageNameInUri ? 'true' : 'false') + enter +
             tab + '}';
     }).join('');
 
@@ -112,7 +117,7 @@ function createModsFile(config, options, callback) {
             return callback(err);
         }
 
-        createFile(options.output, wrapModsWithKMD(config, mods), function(err) {
+        createFile(options.output, wrapModsWithKMD(config, mods, options), function(err) {
             if (err) {
                 return callback(err);
             } else {
