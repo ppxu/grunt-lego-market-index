@@ -1,10 +1,19 @@
+(function(){
+
+var prefix = KISSY.config('assetsPrefix') || '//g.alicdn.com/';
+var base = prefix+'tb/lego-market-test/1.0.1';
+
 KISSY.config({
     'lego-market-test': {
-        mods: ['address', 'confirmOrder']
+        'manifest': 1,
+        'version': '1.0.1',
+        'base': base,
+        'mods': ['address', 'confirmOrder']
     },
     'packages': [{
         'name': 'lego-market-test',
-        'base': 'http://g.alicdn.com/lego-market-test/1.0.1',
+        'base': base,
+        'group': 'tb',
         'ignorePackageNameInUri': true
     }, {
         'name': 'fp',
@@ -15,3 +24,5 @@ KISSY.config({
         'mui/view-port-listen': {"requires":["base","node"],"path":"mui/view-port-listen/1.0.3/index.js"}
     }
 });
+
+})();

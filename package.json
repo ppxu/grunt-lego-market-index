@@ -42,6 +42,7 @@
     "gruntplugin"
   ],
   "dependencies": {
+    "art-template": "^3.0.3",
     "chalk": "^1.0.0",
     "lodash": "^3.3.1"
   }

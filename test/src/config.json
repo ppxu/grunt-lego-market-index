@@ -1,5 +1,6 @@
 {
     "name": "lego-market-test",
+    "group": "tb",
     "version": "1.0.1",
     "dependencies": {
         "packages": [{
