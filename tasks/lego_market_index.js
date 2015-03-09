@@ -11,7 +11,8 @@
 var fs = require('fs'),
     path = require('path'),
     chalk = require('chalk'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    template = require('art-template');
 
 function collecMods(modsDir, callback) {
     var mods = [],
@@ -44,30 +45,12 @@ function wrapModsWithKMD(config, mods, options) {
     var tab = '    ',
         enter = '\n';
 
-    var start =
-        'KISSY.config({' + enter +
-        tab + '\'' + config.name + '\': {' + enter +
-        tab + tab + 'mods: [';
-
-
-    var prefix = options.assetsPrefix || 'http://g.alicdn.com/';
-        
-    var modsArr = mods.sort().map(function(mod) {
+    var modStr = mods.sort().map(function(mod) {
         return '\'' + mod + '\'';
     }).join(', ');
 
-    var middle =
-        ']' + enter +
-        tab + '},' + enter;
 
-    var packages =
-        tab + '\'packages\': [{' + enter +
-        tab + tab + '\'name\': \'' + config.name + '\',' + enter +
-        tab + tab + '\'base\': \''+ prefix + config.name + '/' + config.version + '\',' + enter +
-        tab + tab + '\'ignorePackageNameInUri\': true' + enter +
-        tab + '}';
-
-    var pkgArr = _.isEmpty(config.dependencies.packages) ? '' : config.dependencies.packages.map(function(pg) {
+    var packageStr = _.isEmpty(config.dependencies.packages) ? '' : config.dependencies.packages.map(function(pg) {
         return ', {' + enter +
             tab + tab + '\'name\': \'' + pg.name + '\',' + enter +
             tab + tab + '\'base\': \'' + pg.base + '\',' + enter +
@@ -75,13 +58,12 @@ function wrapModsWithKMD(config, mods, options) {
             tab + '}';
     }).join('');
 
-    var pkgEnd = ']';
 
-    var modules = '';
+    var moduleStr = '';
 
     if (!_.isEmpty(config.dependencies.modules)) {
 
-        modules += ',' + enter +
+        moduleStr += ',' + enter +
             tab + '\'modules\': {' + enter;
 
         var modulesArr = [];
@@ -90,15 +72,23 @@ function wrapModsWithKMD(config, mods, options) {
             modulesArr.push(tab + tab + '\'' + key + '\': ' + JSON.stringify(value));
         });
 
-        modules += modulesArr.join(',');
+        moduleStr += modulesArr.join(',');
 
-        modules += enter + tab + '}';
+        moduleStr += enter + tab + '}';
 
     }
 
-    var end = enter + '});';
+    template.defaults.extname = '';
+    template.defaults.escape = false;
 
-    return start + modsArr + middle + packages + pkgArr + pkgEnd + modules + end;
+    var output = template(__dirname + '/template/index.tpl', {
+        config: config,
+        modStr: modStr,
+        packageStr: packageStr,
+        moduleStr: moduleStr
+    });
+
+    return output;
 }
 
 function createFile(output, content, callback) {
@@ -144,8 +134,8 @@ module.exports = function(grunt) {
             grunt.fail.warn(err);
         }
 
-        if (!cfg || !cfg.name || !cfg.version) {
-            grunt.fail.warn('config.json must have name & version!');
+        if (!cfg || !cfg.name || !cfg.version || !cfg.group) {
+            grunt.fail.warn('config.json must have name & version & group!');
         }
 
         createModsFile(cfg, options, function(err, success) {
